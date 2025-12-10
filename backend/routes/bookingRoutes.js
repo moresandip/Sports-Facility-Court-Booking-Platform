@@ -11,4 +11,7 @@ router.post('/quote', bookingController.calculateBookingPrice);
 // GET /api/bookings - Get all bookings (with optional filters)
 router.get('/', bookingController.getBookings);
 
+// DELETE /api/bookings/:id - Cancel a booking
+router.delete('/:id', bookingController.deleteBooking);
+
 module.exports = router;

@@ -1,8 +1,17 @@
+const mongoose = require('mongoose');
 const Coach = require('../models/Coach');
 
 // Get all coaches
 exports.getCoaches = async (req, res) => {
   try {
+    // Mock Mode Check
+    if (mongoose.connection.readyState !== 1) {
+      return res.json([
+        { _id: '1', name: 'Coach Mike', specialties: ['Tennis'], hourlyRate: 30, isActive: true },
+        { _id: '2', name: 'Coach Sarah', specialties: ['Basketball'], hourlyRate: 35, isActive: true }
+      ]);
+    }
+
     const coaches = await Coach.find({ isActive: true });
     res.json(coaches);
   } catch (error) {

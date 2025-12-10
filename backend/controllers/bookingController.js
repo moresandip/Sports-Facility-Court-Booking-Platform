@@ -1,8 +1,11 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Court = require('../models/Court');
 const Coach = require('../models/Coach');
 const Equipment = require('../models/Equipment');
 const { calculatePrice } = require('../utils/pricingEngine');
+
+let mockBookings = []; // Fallback for when DB is not connected
 
 // Helper to check time overlap
 const checkOverlap = async (courtId, startTime, endTime) => {
@@ -42,6 +45,34 @@ exports.createBooking = async (req, res) => {
 
         if (start >= end) {
             return res.status(400).json({ message: 'Start time must be before end time' });
+        }
+
+        // Mock Mode Check
+        if (mongoose.connection.readyState !== 1) {
+            const mockPrice = {
+                basePrice: 50,
+                peakHourFee: 0,
+                weekendFee: 0,
+                equipmentFee: 0,
+                coachFee: 0,
+                total: 50
+            };
+
+            const newBooking = {
+                _id: Date.now().toString(),
+                user: user || 'guest',
+                court: { _id: courtId, name: 'Mock Court', type: 'indoor' }, // Mock populated court
+                startTime: start,
+                endTime: end,
+                equipment,
+                coach: coachId,
+                status: 'confirmed',
+                pricingBreakdown: mockPrice,
+                createdAt: new Date()
+            };
+            mockBookings.push(newBooking);
+            console.log('Booking created in MOCK mode');
+            return res.status(201).json(newBooking);
         }
 
         // 1. Check Court Availability
@@ -114,6 +145,19 @@ exports.calculateBookingPrice = async (req, res) => {
 
         const start = new Date(startTime);
         const end = new Date(endTime);
+
+        // Mock Mode Check
+        if (mongoose.connection.readyState !== 1) {
+            return res.json({
+                basePrice: 50,
+                peakHourFee: 0,
+                weekendFee: 0,
+                equipmentFee: 0,
+                coachFee: 0,
+                total: 50
+            });
+        }
+
         const court = await Court.findById(courtId);
         if (!court) return res.status(404).json({ message: 'Court not found' });
 
@@ -139,6 +183,17 @@ exports.calculateBookingPrice = async (req, res) => {
 exports.getBookings = async (req, res) => {
     try {
         const { user, date } = req.query;
+
+        // Mock Mode Check
+        if (mongoose.connection.readyState !== 1) {
+            let filtered = [...mockBookings];
+            if (date) {
+                const searchDate = new Date(date).toDateString();
+                filtered = filtered.filter(b => new Date(b.startTime).toDateString() === searchDate);
+            }
+            return res.json(filtered);
+        }
+
         let query = {};
 
         if (user) {
@@ -164,6 +219,31 @@ exports.getBookings = async (req, res) => {
             .sort({ startTime: 1 });
 
         res.json(bookings);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+exports.deleteBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Mock Mode Check
+        if (mongoose.connection.readyState !== 1) {
+            const index = mockBookings.findIndex(b => b._id === id);
+            if (index === -1) {
+                return res.status(404).json({ message: 'Booking not found' });
+            }
+            mockBookings.splice(index, 1);
+            return res.json({ message: 'Booking cancelled successfully (Mock)' });
+        }
+
+        const booking = await Booking.findByIdAndDelete(id);
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        res.json({ message: 'Booking cancelled successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

@@ -8,6 +8,7 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
     const [selectedEquipment, setSelectedEquipment] = useState({}); // { equipmentId: quantity }
 
     const [price, setPrice] = useState(null);
+    const [showBreakdown, setShowBreakdown] = useState(false);
 
     // Fetch resources on mount
     useEffect(() => {
@@ -17,8 +18,8 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
                     fetch('http://localhost:5001/api/coaches').then(r => r.json()),
                     fetch('http://localhost:5001/api/equipment').then(r => r.json())
                 ]);
-                setCoaches(coachesRes);
-                setEquipmentList(equipmentRes);
+                setCoaches(Array.isArray(coachesRes) ? coachesRes : []);
+                setEquipmentList(Array.isArray(equipmentRes) ? equipmentRes : []);
             } catch (err) {
                 console.error("Failed to fetch resources", err);
             }
@@ -175,18 +176,18 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
                     <div className="price-header">
                         <h5>💰 Total Price</h5>
                         {price && (
-                            <div className="price-breakdown-toggle" onClick={() => { }}>
-                                📊 View Breakdown
+                            <div className="price-breakdown-toggle" onClick={() => setShowBreakdown(!showBreakdown)} style={{ cursor: 'pointer' }}>
+                                📊 {showBreakdown ? 'Hide Breakdown' : 'View Breakdown'}
                             </div>
                         )}
                     </div>
                     <div className="price-amount">
                         {price ? (
                             <>
-                                <span className="total-price">${price.total.toFixed(2)}</span>
-                                {price.total > 0 && (
+                                <span className="total-price">${(price.total || 0).toFixed(2)}</span>
+                                {price.total > 0 && showBreakdown && (
                                     <div className="price-details">
-                                        <span>Base: ${price.basePrice?.toFixed(2)}</span>
+                                        <span>Base: ${(price.basePrice || 0).toFixed(2)}</span>
                                         {price.peakHourFee > 0 && <span>Peak: ${price.peakHourFee.toFixed(2)}</span>}
                                         {price.weekendFee > 0 && <span>Weekend: ${price.weekendFee.toFixed(2)}</span>}
                                         {price.equipmentFee > 0 && <span>Equipment: ${price.equipmentFee.toFixed(2)}</span>}

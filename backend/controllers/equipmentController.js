@@ -1,8 +1,17 @@
+const mongoose = require('mongoose');
 const Equipment = require('../models/Equipment');
 
 // Get all equipment
 exports.getEquipment = async (req, res) => {
   try {
+    // Mock Mode Check
+    if (mongoose.connection.readyState !== 1) {
+      return res.json([
+        { _id: '1', name: 'Tennis Racket', type: 'racket', rentalPrice: 5, availableStock: 10, isActive: true },
+        { _id: '2', name: 'Basketball', type: 'ball', rentalPrice: 3, availableStock: 15, isActive: true }
+      ]);
+    }
+
     const equipment = await Equipment.find({ isActive: true });
     res.json(equipment);
   } catch (error) {

@@ -38,6 +38,25 @@ const AdminDashboard = () => {
             .catch(err => console.error("Error fetching bookings:", err));
     };
 
+    const handleCancelBooking = async (id) => {
+        if (window.confirm('Are you sure you want to cancel this booking?')) {
+            try {
+                const res = await fetch(`http://localhost:5001/api/bookings/${id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    alert('Booking cancelled successfully');
+                    fetchBookings();
+                } else {
+                    alert('Failed to cancel booking');
+                }
+            } catch (err) {
+                console.error('Error cancelling booking:', err);
+                alert('Error cancelling booking');
+            }
+        }
+    };
+
     const handleAddCourt = async (e) => {
         e.preventDefault();
         try {
@@ -223,6 +242,7 @@ const AdminDashboard = () => {
                                             <th>👤 User</th>
                                             <th>💰 Total</th>
                                             <th>📊 Status</th>
+                                            <th>❌ Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -257,6 +277,22 @@ const AdminDashboard = () => {
                                                     <span className={`status-badge ${booking.status}`}>
                                                         {booking.status === 'confirmed' ? '✅' : '⏳'} {booking.status}
                                                     </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className="btn-cancel"
+                                                        onClick={() => handleCancelBooking(booking._id)}
+                                                        style={{
+                                                            background: '#ff4d4f',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            padding: '5px 10px',
+                                                            borderRadius: '5px',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}

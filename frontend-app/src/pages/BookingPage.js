@@ -107,7 +107,7 @@ const BookingPage = () => {
                         </div>
                         <div className="form-group">
                             <label className="form-label">Choose your preferred court</label>
-                            <label className="form-label">Choose your preferred court</label>
+
                             <div className="court-list-container">
                                 {courts.map(court => (
                                     <div
