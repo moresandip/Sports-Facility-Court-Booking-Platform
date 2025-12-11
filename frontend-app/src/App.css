@@ -282,6 +282,9 @@ input[type="date"].form-control:focus {
   /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.05);
+
+  /* Force scrollbar to prevent layout shift and ensure visibility */
+  overflow-y: scroll;
 }
 
 .court-list-container::-webkit-scrollbar {
@@ -312,6 +315,8 @@ input[type="date"].form-control:focus {
   border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease;
+  /* Prevent options from shrinking in flex container */
+  flex-shrink: 0;
 }
 
 .court-option:hover {
