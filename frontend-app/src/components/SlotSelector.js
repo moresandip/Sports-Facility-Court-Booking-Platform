@@ -38,7 +38,11 @@ const SlotSelector = ({ selectedDate, selectedSlot, onSelectSlot, bookings = [] 
                     const booked = isSlotBooked(hour);
                     const isSelected = selectedSlot && selectedSlot.getHours() === hour;
                     const currentHour = new Date().getHours();
-                    const isPast = hour <= currentHour && selectedDate.toDateString() === new Date().toDateString();
+                    const now = new Date();
+                    const isToday = selectedDate.toDateString() === now.toDateString();
+                    const isPastDate = selectedDate < new Date(now.setHours(0, 0, 0, 0));
+                    const isPastHour = isToday && hour <= now.getHours();
+                    const isPast = isPastDate || isPastHour;
 
                     return (
                         <button
@@ -70,7 +74,7 @@ const SlotSelector = ({ selectedDate, selectedSlot, onSelectSlot, bookings = [] 
                     );
                 })}
             </div>
-            
+
             {/* Legend */}
             <div className="slot-legend">
                 <div className="legend-item">
