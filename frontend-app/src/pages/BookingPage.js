@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SlotSelector from '../components/SlotSelector';
 import BookingForm from '../components/BookingForm';
 import api from '../services/api';
@@ -11,20 +12,51 @@ const BookingPage = () => {
     const [bookings, setBookings] = useState([]);
     const [bookingSuccess, setBookingSuccess] = useState(false);
 
+    const [searchParams, setSearchParams] = useSearchParams();
+
     // Fetch courts on mount
     useEffect(() => {
         api.getCourts()
             .then(data => {
                 if (Array.isArray(data)) {
                     setCourts(data);
-                    if (data.length > 0) setSelectedCourt(data[0]);
+
+                    // Logic to handle persistence or default selection
+                    if (data.length > 0) {
+                        const courtIdFromUrl = searchParams.get('courtId');
+                        const foundCourt = data.find(c => c._id === courtIdFromUrl);
+
+                        if (foundCourt) {
+                            setSelectedCourt(foundCourt);
+                        } else {
+                            setSelectedCourt(data[0]);
+                        }
+                    }
                 } else {
                     console.error("Courts data is not an array:", data);
                     setCourts([]);
                 }
             })
             .catch(err => console.error("Error fetching courts:", err));
-    }, []);
+    }, []); // Only run on mount to fetch courts
+
+    // Initialize date from URL or default
+    useEffect(() => {
+        const dateFromUrl = searchParams.get('date');
+        if (dateFromUrl) {
+            setSelectedDate(new Date(dateFromUrl));
+        }
+    }, []); // One-time init
+
+    // Update URL when court or date changes
+    useEffect(() => {
+        if (selectedCourt || selectedDate) {
+            const params = {};
+            if (selectedCourt) params.courtId = selectedCourt._id;
+            if (selectedDate) params.date = selectedDate.toISOString().split('T')[0];
+            setSearchParams(params, { replace: true });
+        }
+    }, [selectedCourt, selectedDate, setSearchParams]);
 
     // Fetch bookings when court or date changes
     useEffect(() => {
