@@ -33,34 +33,34 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
     // The requirement says "Live Price Display".
     // Let's try to replicate the logic or just show base price + add-ons.
 
-    const calculateEstimatedPrice = async () => {
-        if (!court || !selectedSlot) return;
-
-        const endTime = new Date(selectedSlot.getTime() + 60 * 60 * 1000); // 1 hour default
-        const equipmentPayload = Object.entries(selectedEquipment)
-            .filter(([_, qty]) => qty > 0)
-            .map(([id, qty]) => ({ item: id, quantity: qty }));
-
-        try {
-            const res = await fetch('http://localhost:5001/api/bookings/quote', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    courtId: court._id,
-                    startTime: selectedSlot,
-                    endTime: endTime,
-                    coachId: selectedCoach || null,
-                    equipment: equipmentPayload
-                })
-            });
-            const data = await res.json();
-            setPrice(data);
-        } catch (err) {
-            console.error("Error calculating price:", err);
-        }
-    };
-
     useEffect(() => {
+        const calculateEstimatedPrice = async () => {
+            if (!court || !selectedSlot) return;
+
+            const endTime = new Date(selectedSlot.getTime() + 60 * 60 * 1000); // 1 hour default
+            const equipmentPayload = Object.entries(selectedEquipment)
+                .filter(([_, qty]) => qty > 0)
+                .map(([id, qty]) => ({ item: id, quantity: qty }));
+
+            try {
+                const res = await fetch('http://localhost:5001/api/bookings/quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        courtId: court._id,
+                        startTime: selectedSlot,
+                        endTime: endTime,
+                        coachId: selectedCoach || null,
+                        equipment: equipmentPayload
+                    })
+                });
+                const data = await res.json();
+                setPrice(data);
+            } catch (err) {
+                console.error("Error calculating price:", err);
+            }
+        };
+
         calculateEstimatedPrice();
     }, [court, selectedSlot, selectedCoach, selectedEquipment]);
 
