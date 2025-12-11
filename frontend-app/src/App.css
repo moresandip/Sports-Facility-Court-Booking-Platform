@@ -284,6 +284,24 @@ input[type="date"].form-control:focus {
   scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.05);
 }
 
+.court-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.court-list-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.court-list-container::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.court-list-container::-webkit-scrollbar-thumb:hover {
+  background: #5a6fd6;
+}
+
 .court-option {
   display: flex;
   justify-content: space-between;
