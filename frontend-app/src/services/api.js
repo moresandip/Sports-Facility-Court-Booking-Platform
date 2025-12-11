@@ -46,8 +46,9 @@ class ApiService {
   }
 
   // Bookings
-  async getBookings() {
-    return this.request('/bookings');
+  async getBookings(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/bookings?${queryString}`);
   }
 
   async createBooking(bookingData) {
@@ -61,6 +62,13 @@ class ApiService {
     return this.request('/bookings/check-availability', {
       method: 'POST',
       body: JSON.stringify(bookingData),
+    });
+  }
+
+  async getQuote(data) {
+    return this.request('/bookings/quote', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 

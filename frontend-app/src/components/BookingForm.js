@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 const BookingForm = ({ selectedSlot, court, onBook }) => {
     const [coaches, setCoaches] = useState([]);
@@ -15,8 +16,8 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
         const fetchResources = async () => {
             try {
                 const [coachesRes, equipmentRes] = await Promise.all([
-                    fetch('http://localhost:5001/api/coaches').then(r => r.json()),
-                    fetch('http://localhost:5001/api/equipment').then(r => r.json())
+                    api.getCoaches(),
+                    api.getEquipment()
                 ]);
                 setCoaches(Array.isArray(coachesRes) ? coachesRes : []);
                 setEquipmentList(Array.isArray(equipmentRes) ? equipmentRes : []);
@@ -43,18 +44,13 @@ const BookingForm = ({ selectedSlot, court, onBook }) => {
                 .map(([id, qty]) => ({ item: id, quantity: qty }));
 
             try {
-                const res = await fetch('http://localhost:5001/api/bookings/quote', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        courtId: court._id,
-                        startTime: selectedSlot,
-                        endTime: endTime,
-                        coachId: selectedCoach || null,
-                        equipment: equipmentPayload
-                    })
+                const data = await api.getQuote({
+                    courtId: court._id,
+                    startTime: selectedSlot,
+                    endTime: endTime,
+                    coachId: selectedCoach || null,
+                    equipment: equipmentPayload
                 });
-                const data = await res.json();
                 setPrice(data);
             } catch (err) {
                 console.error("Error calculating price:", err);

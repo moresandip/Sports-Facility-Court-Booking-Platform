@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SlotSelector from '../components/SlotSelector';
 import BookingForm from '../components/BookingForm';
+import api from '../services/api';
 
 const BookingPage = () => {
     const [courts, setCourts] = useState([]);
@@ -12,8 +13,7 @@ const BookingPage = () => {
 
     // Fetch courts on mount
     useEffect(() => {
-        fetch('http://localhost:5001/api/courts')
-            .then(res => res.json())
+        api.getCourts()
             .then(data => {
                 if (Array.isArray(data)) {
                     setCourts(data);
@@ -30,8 +30,7 @@ const BookingPage = () => {
     useEffect(() => {
         if (selectedCourt) {
             const dateStr = selectedDate.toISOString().split('T')[0];
-            fetch(`http://localhost:5001/api/bookings?court=${selectedCourt._id}&date=${dateStr}`)
-                .then(res => res.json())
+            api.getBookings({ court: selectedCourt._id, date: dateStr })
                 .then(data => {
                     if (Array.isArray(data)) {
                         setBookings(data);
@@ -61,30 +60,22 @@ const BookingPage = () => {
         };
 
         try {
-            const res = await fetch('http://localhost:5001/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const res = await api.createBooking(payload);
 
-            if (res.ok) {
+            if (res) {
                 setBookingSuccess(true);
                 setSelectedSlot(null);
                 // Refresh bookings
                 const dateStr = selectedDate.toISOString().split('T')[0];
-                fetch(`http://localhost:5001/api/bookings?court=${selectedCourt._id}&date=${dateStr}`)
-                    .then(r => r.json())
+                api.getBookings({ court: selectedCourt._id, date: dateStr })
                     .then(d => {
                         if (Array.isArray(d)) setBookings(d);
                         else setBookings([]);
                     });
-            } else {
-                const err = await res.json();
-                alert(`Booking failed: ${err.message}`);
             }
         } catch (error) {
             console.error("Booking error:", error);
-            alert("Booking failed due to server error.");
+            alert("Booking failed due to server error or conflict.");
         }
     };
 
