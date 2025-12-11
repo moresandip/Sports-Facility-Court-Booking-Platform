@@ -1465,22 +1465,135 @@ button:active,
   }
 }
 
+/* =========================================
+   Mobile Responsiveness
+   ========================================= */
+
+@media (max-width: 768px) {
+
+  /* Navigation */
+  .nav-container {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .nav-links {
+    margin-top: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .nav-link {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    padding: 40px 15px;
+  }
+
+  .hero-section h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  /* Layout Grids - Stack vertically on mobile */
+  .selection-grid,
+  .summary-grid,
+  .equipment-grid,
+  .stats-grid,
+  .courts-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  /* Cards & Containers */
+  .main-content {
+    padding: 15px 10px;
+  }
+
+  .booking-form {
+    padding: 20px 15px;
+  }
+
+  /* Court Options */
+  .court-option {
+    padding: 12px;
+  }
+
+  /* Slot Selector */
+  .slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+  }
+
+  .slot-btn {
+    min-height: 60px;
+    padding: 10px 5px;
+  }
+
+  .time-display {
+    font-size: 1rem;
+  }
+
+  .time-range {
+    font-size: 0.8rem;
+  }
+
+  /* Admin Dashboard Tables. 
+     Force horizontal scroll if table is too wide */
+  .bookings-table-container,
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+
+  .bookings-table {
+    min-width: 600px;
+    /* Ensure table doesn't squash */
+  }
+
+  /* Text Adjustments */
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+}
+
 @media (max-width: 480px) {
+
+  /* Extra styling for very small screens */
+  .nav-logo h2 {
+    font-size: 1.5rem;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+
   .nav-links {
     flex-direction: column;
-    width: 100%;
+    align-items: center;
   }
 
   .nav-link {
     width: 100%;
     justify-content: center;
-  }
-
-  .footer-icons {
-    gap: 10px;
-  }
-
-  .footer-icons span {
-    font-size: 1.2rem;
   }
 }
